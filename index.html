@@ -4,14 +4,15 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
-		<script src="./vue.js"></script>
 		<link rel="stylesheet" href="./assets/reset.css" />
 		<link rel="stylesheet" href="./assets/css.css" />
 		<script src="./axios.js"></script>
+		<script src="./vue.js"></script>
 	</head>
 
 	<body>
 		<div id="app" :class="{'showmask': showdown}">
+			<!-- header区域 -->
 			<header class="header">
 				<div class="logo">
 					<svg
@@ -148,74 +149,152 @@
 				</div>
 				<div class="download">下载App</div>
 			</header>
-			<div
-				class="nav"
-				v-for="item in 2"
-				:class="{ 
+			<!-- 导航区域 -->
+			<div class="nav-wrap">
+				<div
+					class="nav"
+					v-for="item in 2"
+					:class="{ 
                     'show-nav': item===1, 
                     'hide-nav': item===2,
                     'transformshow': item===2&&showdown
                 }"
-			>
-				<div class="navlist">
-					<div
-						class="nav"
-						v-for="(nav,index) in navList"
-						:key="nav.id"
-						:class=" {'active': index === navindex}"
-						@click="handleIndex(index)"
-					>
-						{{ nav.title }}
+				>
+					<div class="navlist">
+						<div
+							class="nav"
+							v-for="(nav,index) in navList"
+							:key="nav.id"
+							:class=" {'active': index === navindex}"
+							@click="handleIndex(index)"
+						>
+							{{ nav.title }}
+						</div>
+					</div>
+					<div class="rightdown" v-if="item===1" @click="handleShow">
+						<svg width="15" viewBox="0 0 1024 1024">
+							<path
+								d="M515.2 649.6L169.6 304c-12.8-12.8-32-12.8-44.8 0s-12.8 35.2 0 48l368 364.8c12.8 12.8 32 12.8 44.8 0l361.6-361.6c12.8-12.8 12.8-35.2 0-48s-32-12.8-44.8 0L515.2 649.6z"
+								fill="#ccc"
+							></path>
+						</svg>
+					</div>
+					<div class="bottomdown" v-else @click="handleShow">
+						<svg width="20" viewBox="0 0 1024 1024">
+							<path
+								d="M854.4 713.6c12.8 12.8 32 12.8 44.8 0s12.8-35.2 0-48L537.6 304c-12.8-12.8-32-12.8-44.8 0L124.8 672c-12.8 12.8-12.8 35.2 0 48s32 12.8 44.8 0l345.6-342.4 339.2 336z"
+								fill="#ccc"
+							></path>
+						</svg>
 					</div>
 				</div>
-				<div class="rightdown" v-if="item===1" @click="handleShow">
-					<svg width="15" viewBox="0 0 1024 1024">
-						<path
-							d="M515.2 649.6L169.6 304c-12.8-12.8-32-12.8-44.8 0s-12.8 35.2 0 48l368 364.8c12.8 12.8 32 12.8 44.8 0l361.6-361.6c12.8-12.8 12.8-35.2 0-48s-32-12.8-44.8 0L515.2 649.6z"
-							fill="#ccc"
-						></path>
-					</svg>
-				</div>
-				<div class="bottomdown" v-else @click="handleShow">
-					<svg width="20" viewBox="0 0 1024 1024">
-						<path
-							d="M854.4 713.6c12.8 12.8 32 12.8 44.8 0s12.8-35.2 0-48L537.6 304c-12.8-12.8-32-12.8-44.8 0L124.8 672c-12.8 12.8-12.8 35.2 0 48s32 12.8 44.8 0l345.6-342.4 339.2 336z"
-							fill="#ccc"
-						></path>
-					</svg>
-				</div>
 			</div>
+			<!-- banner -->
+			<template v-if="this.bannerList.length">
+				<div class="banner-box">
+					<div
+						class="banner-list"
+						:style="bannerListStyle"
+						@transitionend="autoMove"
+					>
+						<div
+							class="banner"
+							v-for="banner in bannerList"
+							:key="banner.id"
+						>
+							<img :src="banner.poster" :alt="banner.title" />
+						</div>
+					</div>
+					<ul class="banner-hd">
+						<li
+							v-for="(item,index) in bannerList.length-1"
+							:class="{active: bannerShowIndex === index}"
+						></li>
+					</ul>
+				</div>
+			</template>
+			<!-- 视频区域 -->
+			<!-- 页底 -->
 		</div>
 
 		<script>
-			// const newaxios = axios.create({
-			//     baseUrl: 'https://developer.duyiedu.com/vue/bz'
-			// })
-
 			const vm = new Vue({
 				el: "#app",
 				data: {
 					navList: [],
 					showdown: false,
-                    navindex: "",
+					navindex: 0,
+					bannerList: [],
+					bannerListStyle: {
+						left: 0,
+						transition: "left .3s",
+					},
+					bannerShowIndex: 0,
+					bannerWidth: 350,
 				},
 				methods: {
 					handleShow() {
-                        this.showdown = !this.showdown;
+						this.showdown = !this.showdown;
 					},
 					handleIndex(index) {
 						this.navindex = index;
 					},
+					autoMove() {
+						console.log(
+							this.bannerShowIndex,
+							this.bannerList.length - 1
+						);
+						setTimeout(() => {
+							if (
+								this.bannerShowIndex ==
+								this.bannerList.length - 1
+							) {
+								this.bannerListStyle.left = 0;
+								this.bannerShowIndex = 0;
+								this.bannerListStyle.transition = "left 0";
+								console.log(this.bannerListStyle);
+							} else {
+								this.bannerShowIndex++;
+								this.bannerListStyle.left =
+									-this.bannerShowIndex * this.bannerWidth +
+									"px";
+							}
+						}, 1500);
+					},
 				},
+				// watch: {
+				// 	bannerListStyle: {
+
+				// 	},
+				// },
 				created() {
+					// 获取nav数据
 					axios
 						.get("https://developer.duyiedu.com/vue/bz/nav")
 						.then((res) => {
-							this.navList = res.data.data;
-						})
-						.catch((error) => {
-							console.log(error);
+							if (res.status === 200) {
+								this.navList = res.data.data;
+							}
 						});
+
+					// 获取banner数据
+					axios
+						.get("https://developer.duyiedu.com/vue/bz/banner")
+						.then((res) => {
+							if (res.status === 200) {
+								const lastBanner = { ...res.data.data[0] };
+								lastBanner.id = Math.floor(
+									Math.random() * 10000000
+								);
+								this.bannerList = [
+									...res.data.data,
+									lastBanner,
+								];
+							}
+						});
+				},
+				mounted() {
+					this.autoMove();
 				},
 			});
 		</script>
