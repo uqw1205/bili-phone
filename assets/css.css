@@ -1,3 +1,11 @@
+html,body{
+	height: 100%;
+}
+#app{
+	height: 100%;
+    overflow-y: scroll;
+}
+
 .showmask::after{
 	content: '';
 	position: fixed;
@@ -156,4 +164,59 @@
 }
 .banner-hd li.active{
 	background: #fb7299;
+}
+.video-wrap{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0 3.5%;
+    margin-top: 10px;
+}
+.video{
+	width: 48%;
+	margin-bottom: 10px;
+}
+.video .img{
+	border-radius: 5px;
+	overflow: hidden;
+	position: relative;
+}
+.video .img img{
+	width: 100%;
+	display: block;
+    height: 104px;
+}
+
+.video .img .info{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+    width: 100%;
+    color: #fff;
+    font-size: 13px;
+    font-family: arial;
+    display: flex;
+    justify-content: space-around;
+	padding: 5px 0;
+	background-image: linear-gradient(to top, rgba(33,33,33,.3), rgba(33,33,33,0));
+}
+.video .img .info SPAN{
+	DISPLAY: FLEX;
+	align-items: center;
+    width: 42%;
+}
+
+.video .img .info svg{
+	fill: #fff;
+	margin-right: 3px;
+}
+.video-wrap .title{
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 16px;
+    font-size: 12px;
+    font-family: arial;
+    margin-top: 5px;
 }

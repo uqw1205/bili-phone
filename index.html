@@ -11,7 +11,7 @@
 	</head>
 
 	<body>
-		<div id="app" :class="{'showmask': showdown}">
+		<div id="app" :class="{'showmask': showdown}" @scroll="handleScroll">
 			<!-- header区域 -->
 			<header class="header">
 				<div class="logo">
@@ -216,12 +216,12 @@
 			</template>
 			<!-- 视频区域 -->
 			<div class="video-wrap">
-				<div class="video" v-for="video in videoList" :key="video.id">
+				<div class="video" v-for="video in videoNewList" :key="video.id">
 					<div class="img">
 						<img :src='video.poster'>
 						<div class="info">
-							<span><svg id="icon-bofangshu" viewBox="0 0 1024 1024"><path d="M800 128H224C134.4 128 64 198.4 64 288v448c0 89.6 70.4 160 160 160h576c89.6 0 160-70.4 160-160V288c0-89.6-70.4-160-160-160z m96 608c0 54.4-41.6 96-96 96H224c-54.4 0-96-41.6-96-96V288c0-54.4 41.6-96 96-96h576c54.4 0 96 41.6 96 96v448z"></path><path d="M684.8 483.2l-256-112c-22.4-9.6-44.8 6.4-44.8 28.8v224c0 22.4 22.4 38.4 44.8 28.8l256-112c25.6-9.6 25.6-48 0-57.6z"></path></svg>{{ video.play }}</span>
-							<span><img src="" alt="">{{ video.rank }}</span>
+							<span><svg width='15' id="icon-bofangshu" viewBox="0 0 1024 1024"><path d="M800 128H224C134.4 128 64 198.4 64 288v448c0 89.6 70.4 160 160 160h576c89.6 0 160-70.4 160-160V288c0-89.6-70.4-160-160-160z m96 608c0 54.4-41.6 96-96 96H224c-54.4 0-96-41.6-96-96V288c0-54.4 41.6-96 96-96h576c54.4 0 96 41.6 96 96v448z"></path><path d="M684.8 483.2l-256-112c-22.4-9.6-44.8 6.4-44.8 28.8v224c0 22.4 22.4 38.4 44.8 28.8l256-112c25.6-9.6 25.6-48 0-57.6z"></path></svg>{{ video.play }}</span>
+							<span><svg width='15' viewBox="0 0 1024 1024"><path d="M800 128H224C134.4 128 64 198.4 64 288v448c0 89.6 70.4 160 160 160h576c89.6 0 160-70.4 160-160V288c0-89.6-70.4-160-160-160z m96 608c0 54.4-41.6 96-96 96H224c-54.4 0-96-41.6-96-96V288c0-54.4 41.6-96 96-96h576c54.4 0 96 41.6 96 96v448z"></path><path d="M240 384h64v64h-64zM368 384h384v64h-384zM432 576h352v64h-352zM304 576h64v64h-64z"></path></svg>{{ video.rank }}</span>
 						</div>
 					</div>
 					<div class="title">
@@ -248,6 +248,18 @@
 					bannerShowIndex: 0,
 					bannerWidth: 350,
 					videoList: [],
+					getVideoData: false,
+
+				},
+				computed: {
+					videoNewList(){
+						// map
+						return this.videoList.map(video => {
+							video.play = video.play > 10000 ? video.play / 10000 + '万' : video.play;
+							video.rank = video.rank > 10000 ? video.rank / 10000 + '万' : video.rank;
+							return video;
+						})
+					}
 				},
 				methods: {
 					handleShow() {
@@ -255,6 +267,29 @@
 					},
 					handleIndex(index) {
 						this.navindex = index;
+					},
+					handleScroll(e){
+						// console.log(e.target.offsetHeight);  body高度
+						// console.log(e.target.scrollTop)  滚动距离
+						// console.log(e.target.scrollHeight)  app高度
+						// 元素位置 元素高度
+						const {scrollHeight, offsetHeight, scrollTop} = e.target;
+						const toBottom = scrollHeight-offsetHeight- scrollTop;
+						if(toBottom < 120 && !this.getVideoData){
+							this.getVideoData = true;
+							axios
+								.get("https://developer.duyiedu.com/vue/bz/video",{
+									params: {
+										start: this.videoList.length,
+										offset: 16
+									}
+								})
+								.then((res) => {
+									// 解构push进数组
+									this.videoList.push(...res.data.data);
+									this.getVideoData = false;
+								});
+						}
 					},
 					autoMove() {
 						if (
@@ -311,8 +346,10 @@
 								}
 							})
 							.then((res) => {
-								console.log(res.data.data);
 								this.videoList = res.data.data;
+								// res.data.data.map()
+								this.videoList.play = this.videoList.play>10000 ? this.videoList.play/10000 + "万": this.videoList.play
+								this.videoList.rank = this.videoList.rank>10000 ? this.videoList.rank/10000 + "万": this.videoList.rank
 							});
 					},
 				},
